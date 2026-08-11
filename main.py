@@ -16,6 +16,12 @@ class MyMainWindow(ctk.CTk):
 
         self.todo = ctk.CTkFrame(self)
         ctk.CTkLabel(self.todo, text="To do").pack(side="top")
+        #to do page sitting
+        self.scroll_todo = ctk.CTkScrollableFrame(self.todo)
+        self.scroll_todo.pack(fill="both", expand=True,padx=10,pady=10)
+
+        self.task_enter = ctk.CTkEntry(self.todo,placeholder_text="new task")
+        self.task_enter.pack(side="right",padx=60,pady=10)
 
         self.secret = ctk.CTkFrame(self)
         ctk.CTkLabel(self.secret, text="Password").pack(side="top")
@@ -41,6 +47,13 @@ class MyMainWindow(ctk.CTk):
 
         self.todo_btm = ctk.CTkButton(self.sidebar,text="Todo",command= self.todo_page)
         self.todo_btm.pack(side="top",padx=10,pady=10)
+            #to do bottoms
+        self.add_task_btm = ctk.CTkButton(self.todo,text='add',command=self.add_task_function)
+        self.add_task_btm.pack(side="right",padx=10,pady=10)
+
+        self.clear = ctk.CTkButton(self.todo,text="Clear",command=self.clear_task)
+        self.clear.pack(side="right",padx=0,pady=5)
+
 
         self.secret_btm = ctk.CTkButton(self.sidebar,text="Secret",command= self.secret_page)
         self.secret_btm.pack(side="top",padx=10,pady=10)
@@ -68,6 +81,20 @@ class MyMainWindow(ctk.CTk):
     def todo_page(self):
         self.forget_all()
         self.todo.pack(fill="both",padx=10,pady=10,expand=True)
+        #to do functions
+    def add_task_function(self):
+        text = self.task_enter.get()
+        if text != '':
+            task_check = ctk.CTkCheckBox(self.scroll_todo,text=text)
+            task_check.configure(command=lambda cd=task_check:self.on_check(cd))
+            task_check.pack(side="top", anchor="w",padx=10,pady=10)
+            self.task_enter.delete(0,"end")
+    def on_check(self,cb):
+        if cb.get() ==1:
+            self.after(30000,lambda: cb.destroy())
+
+    def clear_task(self):
+        self.task_enter.delete(0,"end")
 
     def secret_page(self):
         self.forget_all()
