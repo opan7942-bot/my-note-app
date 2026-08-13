@@ -13,6 +13,12 @@ class MyMainWindow(ctk.CTk):
         #pages
         self.note = ctk.CTkFrame(self)
         ctk.CTkLabel(self.note, text="Note").pack(side="top")
+        #note page sitting
+        self.scroll_note = ctk.CTkScrollableFrame(self.note)
+        self.scroll_note.pack(side="top",fill="both",expand=True)
+
+        self.note_textbox = ctk.CTkTextbox(self.note)
+        self.note_textbox.pack(side="right",padx=10,pady=10)
 
         self.todo = ctk.CTkFrame(self)
         ctk.CTkLabel(self.todo, text="To do").pack(side="top")
@@ -44,6 +50,9 @@ class MyMainWindow(ctk.CTk):
         #bottoms
         self.note_btm = ctk.CTkButton(self.sidebar,text="Note",command= self.note_page)
         self.note_btm.pack(side="top",padx=10,pady=10)
+            #note bottoms
+        self.add_note_btn = ctk.CTkButton(self.note,text="save",command= self.add_note)
+        self.add_note_btn.pack(side="top",padx=10,pady=10)
 
         self.todo_btm = ctk.CTkButton(self.sidebar,text="Todo",command= self.todo_page)
         self.todo_btm.pack(side="top",padx=10,pady=10)
@@ -77,6 +86,14 @@ class MyMainWindow(ctk.CTk):
     def note_page(self):
         self.forget_all()
         self.note.pack(fill="both",padx=10,pady=10,expand=True)
+        #note functions
+    def add_note(self):
+        text = self.note_textbox.get("1.0","end")
+        if text != '':
+            new_box = ctk.CTkTextbox(self.scroll_note, height=70)
+            new_box.insert("1.0", text)
+            new_box.pack(side="top", fill="x", padx=5, pady=5)
+            self.note_textbox.delete("1.0", "end")
 
     def todo_page(self):
         self.forget_all()
@@ -110,4 +127,3 @@ class MyMainWindow(ctk.CTk):
 
 app = MyMainWindow()
 app.mainloop()
-
