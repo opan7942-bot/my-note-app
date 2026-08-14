@@ -1,3 +1,5 @@
+import secrets
+
 import customtkinter as ctk
 
 class MyMainWindow(ctk.CTk):
@@ -19,6 +21,7 @@ class MyMainWindow(ctk.CTk):
 
         self.note_textbox = ctk.CTkTextbox(self.note)
         self.note_textbox.pack(side="right",padx=10,pady=10)
+        #===================
 
         self.todo = ctk.CTkFrame(self)
         ctk.CTkLabel(self.todo, text="To do").pack(side="top")
@@ -28,10 +31,18 @@ class MyMainWindow(ctk.CTk):
 
         self.task_enter = ctk.CTkEntry(self.todo,placeholder_text="new task")
         self.task_enter.pack(side="right",padx=60,pady=10)
-
+        #=======================
         self.secret = ctk.CTkFrame(self)
         ctk.CTkLabel(self.secret, text="Password").pack(side="top")
+        #secret page sitting
+        self.scroll_secret = ctk.CTkScrollableFrame(self.secret)
+        self.scroll_secret.pack(fill="both",expand=True,padx=10,pady=10)
 
+        self.secret_entry = ctk.CTkEntry(self.secret,placeholder_text="new secret",show="*")
+        self.secret_entry.pack(side="right",padx=6,pady=10)
+        self.secret_title = ctk.CTkEntry(self.secret,placeholder_text="new title")
+        self.secret_title.pack(side="right",padx=0,pady=10)
+        #=======================
         self.photo = ctk.CTkFrame(self)
         ctk.CTkLabel(self.photo, text="Pics").pack(side="top")
 
@@ -53,7 +64,7 @@ class MyMainWindow(ctk.CTk):
             #note bottoms
         self.add_note_btn = ctk.CTkButton(self.note,text="save",command= self.add_note)
         self.add_note_btn.pack(side="top",padx=10,pady=10)
-
+            #================
         self.todo_btm = ctk.CTkButton(self.sidebar,text="Todo",command= self.todo_page)
         self.todo_btm.pack(side="top",padx=10,pady=10)
             #to do bottoms
@@ -62,11 +73,14 @@ class MyMainWindow(ctk.CTk):
 
         self.clear = ctk.CTkButton(self.todo,text="Clear",command=self.clear_task)
         self.clear.pack(side="right",padx=0,pady=5)
-
+            #=================
 
         self.secret_btm = ctk.CTkButton(self.sidebar,text="Secret",command= self.secret_page)
         self.secret_btm.pack(side="top",padx=10,pady=10)
-
+            #secret bottoms
+        self.add_secret_btn = ctk.CTkButton(self.secret,text="add",command= self.add_secret)
+        self.add_secret_btn.pack(side="left",padx=50,pady=10)
+            #=================
         self.photo_btm = ctk.CTkButton(self.sidebar,text="Photo",command= self.photo_page)
         self.photo_btm.pack(side="top",padx=10,pady=10)
 
@@ -94,10 +108,12 @@ class MyMainWindow(ctk.CTk):
             new_box.insert("1.0", text)
             new_box.pack(side="top", fill="x", padx=5, pady=5)
             self.note_textbox.delete("1.0", "end")
+        #====================
 
     def todo_page(self):
         self.forget_all()
         self.todo.pack(fill="both",padx=10,pady=10,expand=True)
+
         #to do functions
     def add_task_function(self):
         text = self.task_enter.get()
@@ -112,11 +128,22 @@ class MyMainWindow(ctk.CTk):
 
     def clear_task(self):
         self.task_enter.delete(0,"end")
+        #================
 
     def secret_page(self):
         self.forget_all()
         self.secret.pack(fill="both",padx=10,pady=10, expand=True)
-
+        #secret functions
+    def add_secret(self):
+        secret = self.secret_entry.get()
+        secret_title = self.secret_title.get()
+        text= f"{secret_title} : {secret}"
+        if secret != '':
+            text_box = ctk.CTkLabel(self.scroll_secret,text=text)
+            text_box.pack(side="top",anchor="w", fill="x", padx=5, pady=5)
+            self.secret_entry.delete(0,"end")
+            self.secret_title.delete(0,"end")
+        #================
     def photo_page(self):
         self.forget_all()
         self.photo.pack(fill="both",padx=10,pady=10, expand=True)
