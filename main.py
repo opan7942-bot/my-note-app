@@ -1,5 +1,3 @@
-import secrets
-
 import customtkinter as ctk
 
 class MyMainWindow(ctk.CTk):
