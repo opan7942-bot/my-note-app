@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from tkinter import filedialog
+from PIL import Image
 
 class MyMainWindow(ctk.CTk):
     def __init__(self):
@@ -43,6 +45,12 @@ class MyMainWindow(ctk.CTk):
         #=======================
         self.photo = ctk.CTkFrame(self)
         ctk.CTkLabel(self.photo, text="Pics").pack(side="top")
+        #photo page sitting
+        self.scroll_photo = ctk.CTkScrollableFrame(self.photo)
+        self.scroll_photo.pack(fill="both",expand=True,padx=10,pady=10)
+
+
+        #======================
 
         self.upload_download = ctk.CTkFrame(self)
         ctk.CTkLabel(self.upload_download, text="Data").pack(side="top")
@@ -56,16 +64,16 @@ class MyMainWindow(ctk.CTk):
         sidebar_label.pack(side="top",padx=10,pady=10)
 
 
-        #bottoms
+        #buttons
         self.note_btm = ctk.CTkButton(self.sidebar,text="Note",command= self.note_page)
         self.note_btm.pack(side="top",padx=10,pady=10)
-            #note bottoms
+            #note buttons
         self.add_note_btn = ctk.CTkButton(self.note,text="save",command= self.add_note)
         self.add_note_btn.pack(side="top",padx=10,pady=10)
             #================
         self.todo_btm = ctk.CTkButton(self.sidebar,text="Todo",command= self.todo_page)
         self.todo_btm.pack(side="top",padx=10,pady=10)
-            #to do bottoms
+            #to do buttons
         self.add_task_btm = ctk.CTkButton(self.todo,text='add',command=self.add_task_function)
         self.add_task_btm.pack(side="right",padx=10,pady=10)
 
@@ -75,12 +83,17 @@ class MyMainWindow(ctk.CTk):
 
         self.secret_btm = ctk.CTkButton(self.sidebar,text="Secret",command= self.secret_page)
         self.secret_btm.pack(side="top",padx=10,pady=10)
-            #secret bottoms
+            #secret buttons
         self.add_secret_btn = ctk.CTkButton(self.secret,text="add",command= self.add_secret)
         self.add_secret_btn.pack(side="left",padx=50,pady=10)
             #=================
         self.photo_btm = ctk.CTkButton(self.sidebar,text="Photo",command= self.photo_page)
         self.photo_btm.pack(side="top",padx=10,pady=10)
+            # photo buttons
+        self.add_photo = ctk.CTkButton(self.photo,text="add",command= self.get_photo)
+        self.add_photo.pack(side="right",padx=10,pady=10)
+
+            #================
 
         self.upload_download_btm = ctk.CTkButton(self.sidebar,text="Upload/download",command= self.upload_page)
         self.upload_download_btm.pack(side="top",padx=10,pady=10)
@@ -145,6 +158,32 @@ class MyMainWindow(ctk.CTk):
     def photo_page(self):
         self.forget_all()
         self.photo.pack(fill="both",padx=10,pady=10, expand=True)
+        #photo functions
+    def get_photo(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Images", "*.png *.jpg *.jpeg")])
+        if file_path:
+            img = Image.open(file_path)
+            ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(50, 50))
+
+            btn = ctk.CTkButton(
+                self.scroll_photo,
+                image=ctk_img,
+                text="",
+                fg_color="transparent",  # يجعل خلفية الزر شفافة لتظهر الصورة فقط
+                command=lambda: self.show_full_image(file_path)
+            )
+            btn.pack(side="right", pady=10)
+
+    def show_full_image(self, file_path):
+        popup = ctk.CTkToplevel(self)
+        popup.title("Full Image")
+        popup.geometry("500x500")
+
+        full_image = Image.open(file_path)
+        full_ctk_img = ctk.CTkImage(light_image=full_image, dark_image=full_image, size=(450, 450))
+        image_label = ctk.CTkLabel(popup, image=full_ctk_img, text="")
+        image_label.pack(expand=True)
+        #================
 
     def upload_page(self):
         self.forget_all()
