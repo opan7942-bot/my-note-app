@@ -1,10 +1,15 @@
 import customtkinter as ctk
 from tkinter import filedialog
 from PIL import Image
+import os ,shutil
+import app_data
+
+app_data.init_db()
 
 class MyMainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
+
 
         ctk.set_appearance_mode("system")
         ctk.set_default_color_theme("blue")
@@ -54,6 +59,10 @@ class MyMainWindow(ctk.CTk):
 
         self.upload_download = ctk.CTkFrame(self)
         ctk.CTkLabel(self.upload_download, text="Data").pack(side="top")
+        #data page sitting
+        self.button_place = ctk.CTkFrame(self.upload_download,width=180)
+        self.button_place.pack(side="top",padx=10,pady=10)
+        #=====================
 
         #frames for the app
         self.sidebar = ctk.CTkFrame(self,width=180)
@@ -97,7 +106,16 @@ class MyMainWindow(ctk.CTk):
 
         self.upload_download_btm = ctk.CTkButton(self.sidebar,text="Upload/download",command= self.upload_page)
         self.upload_download_btm.pack(side="top",padx=10,pady=10)
+            # data buttons
+        self.upload_btn = ctk.CTkButton(self.button_place,text="upload",command= self.upload_file)
+        self.upload_btn.pack(side="left",padx=10,pady=10)
 
+        self.download_btn = ctk.CTkButton(self.button_place,text="download",command= self.download_file)
+        self.download_btn.pack(side="right",padx=10,pady=10)
+
+        self.download = ctk.CTkButton(self)
+            #===============
+        self.load_saved_data()
 
         self.todo_page()
         #functions
@@ -115,6 +133,7 @@ class MyMainWindow(ctk.CTk):
     def add_note(self):
         text = self.note_textbox.get("1.0","end")
         if text != '':
+            app_data.add_note_data(text)
             new_box = ctk.CTkTextbox(self.scroll_note, height=70)
             new_box.insert("1.0", text)
             new_box.pack(side="top", fill="x", padx=5, pady=5)
@@ -129,6 +148,7 @@ class MyMainWindow(ctk.CTk):
     def add_task_function(self):
         text = self.task_enter.get()
         if text != '':
+            app_data.add_todo_data(text)
             task_check = ctk.CTkCheckBox(self.scroll_todo,text=text)
             task_check.configure(command=lambda cd=task_check:self.on_check(cd))
             task_check.pack(side="top", anchor="w",padx=10,pady=10)
@@ -150,6 +170,7 @@ class MyMainWindow(ctk.CTk):
         secret_title = self.secret_title.get()
         text= f"{secret_title} : {secret}"
         if secret != '':
+            app_data.add_secret_data(secret_title,secret)
             text_box = ctk.CTkLabel(self.scroll_secret,text=text)
             text_box.pack(side="top",anchor="w", fill="x", padx=5, pady=5)
             self.secret_entry.delete(0,"end")
@@ -188,6 +209,46 @@ class MyMainWindow(ctk.CTk):
     def upload_page(self):
         self.forget_all()
         self.upload_download.pack(fill="both",padx=10,pady=10, expand=True)
+        #data function
+        """this functions aren't complete yet (upload , download)"""
+    def upload_file(self):
+        file_path = filedialog.askopenfilename(filetypes=[("file", "*.db")])
+        if file_path:
+            print(file_path)
+    def download_file(self):
+        current = os.getcwd()
+        data_path = os.path.join(current,"data")
+        folder_in = os.listdir(data_path)
+        if "test.txt" in folder_in:
+            print(True)
+        else:
+            print(False)
+        #===============
+        #reload data to app
+    def load_saved_data(self):
+        # 1. تحميل الملاحظات
+        notes = app_data.get_notes_data()
+        for row in notes:
+            # row عبارة عن tuple يحتوي عل النص في العنصر الأول row[0]
+            new_box = ctk.CTkTextbox(self.scroll_note, height=70)
+            new_box.insert("1.0", row[0])
+            new_box.pack(side="top", fill="x", padx=5, pady=5)
 
+        # 2. تحميل المهام
+        todos = app_data.get_todos_data()
+        for row in todos:
+            task_check = ctk.CTkCheckBox(self.scroll_todo, text=row[0])
+            task_check.configure(command=lambda cd=task_check: self.on_check(cd))
+            task_check.pack(side="top", anchor="w", padx=10, pady=10)
+
+        # 3. تحميل الأسرار
+        secrets = app_data.get_secret_data()
+        for row in secrets:
+            # row[0] هي العنوان و row[1] هي كلمة السر
+            text = f"{row[0]} : {row[1]}"
+            text_box = ctk.CTkLabel(self.scroll_secret, text=text)
+            text_box.pack(side="top", anchor="w", fill="x", padx=5, pady=5)
+
+        #=================
 app = MyMainWindow()
 app.mainloop()
