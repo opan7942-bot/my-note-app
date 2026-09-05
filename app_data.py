@@ -90,11 +90,20 @@ def get_todos_data():
     cursor = conn.cursor()
 
     # جلب كل النصوص المحفوظة في جدول الملاحظات
-    cursor.execute("SELECT task FROM todos")
-    rows = cursor.fetchall()  # ترجع قائمة مثل: [("ملاحظة 1",), ("ملاحظة 2",)]
+    cursor.execute("SELECT id,task FROM todos")
+    rows = cursor.fetchall()
 
     conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
     return rows
+
+def delete_todo_data(todo_id):
+    current = os.getcwd()
+    path = os.path.join(current, "data")
+    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM todos WHERE id = ?", (todo_id,))
+    conn.commit()
+    conn.close()
 
 def add_secret_data(title,password):
     current = os.getcwd()
@@ -112,8 +121,16 @@ def get_secret_data():
     cursor = conn.cursor()
 
     # جلب كل النصوص المحفوظة في جدول الملاحظات
-    cursor.execute("SELECT title, password FROM secrets")
-    rows = cursor.fetchall()  # ترجع قائمة مثل: [("ملاحظة 1",), ("ملاحظة 2",)]
+    cursor.execute("SELECT id,title, password FROM secrets")
+    rows = cursor.fetchall()
 
     conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
     return rows
+def delete_secret_data(secret_id):
+    current = os.getcwd()
+    path = os.path.join(current, "data")
+    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM secrets WHERE id = ?", (secret_id,))
+    conn.commit()
+    conn.close()

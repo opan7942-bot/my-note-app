@@ -48,7 +48,7 @@ class SecretView(ctk.CTkFrame):
 
         self.load_data()
 
-    def create_secret_card(self, title, secret):
+    def create_secret_card(self, title, secret,secret_id=None):
         """Helper to create a secure, toggleable secret card with a copy-ready feel."""
         card = ctk.CTkFrame(self.scroll_secret, fg_color=("gray90", "gray20"), corner_radius=10)
         card.pack(side="top", fill="x", padx=5, pady=4)
@@ -101,9 +101,13 @@ class SecretView(ctk.CTkFrame):
             fg_color="transparent",
             hover_color=("gray75", "gray30"),
             text_color=("gray40", "gray60"),
-            command=lambda: card.destroy()
+            command=lambda: self.delete_secret(card, secret_id)
         )
         delete_btn.pack(side="right", padx=(5, 10), pady=10)
+    def delete_secret(self,card, secret_id):
+        if secret_id is not None:
+            app_data.delete_secret_data(secret_id)
+        card.destroy()
 
     def toggle_secret_visibility(self, field, btn):
         """Toggle between hidden asterisks and plain text."""
@@ -126,4 +130,4 @@ class SecretView(ctk.CTkFrame):
     def load_data(self):
         secrets = app_data.get_secret_data()
         for row in secrets:
-            self.create_secret_card(row[0], row[1])
+            self.create_secret_card(secret_id=row[0], title=row[1],secret=row[2])

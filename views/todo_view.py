@@ -52,7 +52,7 @@ class TodoView(ctk.CTkFrame):
 
         self.load_data()
 
-    def create_task_row(self, text):
+    def create_task_row(self, text,task_id=None):
         """Helper to create a clean task item card with a delete button."""
         card = ctk.CTkFrame(self.scroll_todo, fg_color=("gray90", "gray20"), corner_radius=10)
         card.pack(side="top", fill="x", padx=5, pady=4)
@@ -63,7 +63,7 @@ class TodoView(ctk.CTkFrame):
             font=ctk.CTkFont(size=13),
             corner_radius=6
         )
-        task_check.configure(command=lambda cb=task_check, parent_card=card: self.on_check(cb, parent_card))
+        task_check.configure(command=lambda cb=task_check, parent_card=card: self.on_check(cb, parent_card,task_id))
         task_check.pack(side="left", padx=15, pady=12, fill="x", expand=True)
 
         delete_btn = ctk.CTkButton(
@@ -75,9 +75,13 @@ class TodoView(ctk.CTkFrame):
             fg_color="transparent",
             hover_color=("gray75", "gray30"),
             text_color=("gray40", "gray60"),
-            command=lambda: card.destroy()
+            command=lambda: self.delete_task(card,task_id)
         )
         delete_btn.pack(side="right", padx=10, pady=10)
+    def delete_task(self,card,task_id):
+        if task_id is not None:
+            app_data.delete_todo_data(task_id)
+        card.destroy()
 
     def add_task_function(self):
         text = self.task_enter.get()
@@ -86,10 +90,11 @@ class TodoView(ctk.CTkFrame):
             self.create_task_row(text)
             self.task_enter.delete(0, "end")
 
-    def on_check(self, cb, parent_card):
+    def on_check(self, cb, parent_card,task_id):
         if cb.get() == 1:
             # Auto-destroy task after brief feedback delay
             self.after(1500, lambda: parent_card.destroy())
+            self.delete_task(cb,task_id)
 
     def clear_task(self):
         self.task_enter.delete(0, "end")
@@ -97,4 +102,4 @@ class TodoView(ctk.CTkFrame):
     def load_data(self):
         todos = app_data.get_todos_data()
         for row in todos:
-            self.create_note_or_task = self.create_task_row(row[0])
+            self.create_task_row(task_id=row[0],text=row[1])
