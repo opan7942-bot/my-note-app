@@ -59,11 +59,20 @@ def get_notes_data():
     cursor = conn.cursor()
 
     # جلب كل النصوص المحفوظة في جدول الملاحظات
-    cursor.execute("SELECT text FROM notes")
-    rows = cursor.fetchall()  # ترجع قائمة مثل: [("ملاحظة 1",), ("ملاحظة 2",)]
+    cursor.execute("SELECT id, text FROM notes")
+    rows = cursor.fetchall()
 
     conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
     return rows
+
+def delete_note_data(note_id): # to delete a note
+    current = os.getcwd()
+    path = os.path.join(current, "data")
+    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+    conn.commit()
+    conn.close()
 
 def add_todo_data(task):
     current = os.getcwd()
