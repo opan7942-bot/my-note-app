@@ -6,11 +6,19 @@ Database initialization and CRUD operations module.
 Handles sqlite database operations for Notes, Todos, Secrets, and Image Paths.
 """
 
+
 def get_db_path():
-    """Generates a reliable database path relative to the executable location."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(base_dir, "data")
+    """حفظ قاعدة البيانات في مجلد AppData الخاص بنظام الويندوز لحل مشاكل سطح المكتب والـ EXE"""
+    # جلب مسار مجلد AppData الخاص بالمستخدم الحالي
+    user_appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+
+    # إنشاء مجلد ثابت باسم برنامجك داخل AppData
+    app_folder = os.path.join(user_appdata, "MyDesktopApp")
+    data_dir = os.path.join(app_folder, "data")
+
+    # التأكد من وجود المجلد
     os.makedirs(data_dir, exist_ok=True)
+
     return os.path.join(data_dir, "my_app_data.db")
 
 def init_db():
