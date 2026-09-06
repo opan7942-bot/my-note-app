@@ -2,19 +2,22 @@ import sqlite3
 import os
 
 """
-creat a file
-creat tables and adding functions
-make everything ready for the program
+Database initialization and CRUD operations module.
+Handles sqlite database operations for Notes, Todos, Secrets, and Image Paths.
 """
+
+def get_db_path():
+    """Generates a reliable database path relative to the executable location."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(base_dir, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    return os.path.join(data_dir, "my_app_data.db")
+
 def init_db():
-    current = os.getcwd()
-    path = os.path.join(current,"data")
-    os.makedirs(path, exist_ok=True)
-    # الاتصال بملف القاعدة (سينشئه إذا لم يكن موجوداً)
-    conn = sqlite3.connect(os.path.join(path,"my_app_data.db"))
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
 
-    # 1. جدول الملاحظات
+    # 1. Notes Table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS notes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +25,7 @@ def init_db():
         )
     """)
 
-    # 2. جدول المهام
+    # 2. Todos Table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS todos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +33,7 @@ def init_db():
         )
     """)
 
-    # 3. جدول كلمات السر
+    # 3. Secrets Table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS secrets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,98 +42,109 @@ def init_db():
         )
     """)
 
+    # 4. Image Paths Table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pic_path (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT
+        )
+    """)
+
     conn.commit()
     conn.close()
 
+# --- NOTES ---
+
 def add_note_data(text):
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("INSERT INTO notes (text) VALUES (?)", (text,))
     conn.commit()
     conn.close()
 
-
 def get_notes_data():
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))  # مسار القاعدة
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
-
-    # جلب كل النصوص المحفوظة في جدول الملاحظات
     cursor.execute("SELECT id, text FROM notes")
     rows = cursor.fetchall()
-
-    conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
+    conn.close()
     return rows
 
-def delete_note_data(note_id): # to delete a note
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+def delete_note_data(note_id):
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
     conn.commit()
     conn.close()
 
+# --- TODOS ---
+
 def add_todo_data(task):
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("INSERT INTO todos (task) VALUES (?)", (task,))
     conn.commit()
     conn.close()
 
 def get_todos_data():
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))  # مسار القاعدة
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
-
-    # جلب كل النصوص المحفوظة في جدول الملاحظات
-    cursor.execute("SELECT id,task FROM todos")
+    cursor.execute("SELECT id, task FROM todos")
     rows = cursor.fetchall()
-
-    conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
+    conn.close()
     return rows
 
 def delete_todo_data(todo_id):
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("DELETE FROM todos WHERE id = ?", (todo_id,))
     conn.commit()
     conn.close()
 
-def add_secret_data(title,password):
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+# --- SECRETS ---
+
+def add_secret_data(title, password):
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("INSERT INTO secrets (title, password) VALUES (?, ?)", (title, password))
     conn.commit()
     conn.close()
 
 def get_secret_data():
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))  # مسار القاعدة
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
-
-    # جلب كل النصوص المحفوظة في جدول الملاحظات
-    cursor.execute("SELECT id,title, password FROM secrets")
+    cursor.execute("SELECT id, title, password FROM secrets")
     rows = cursor.fetchall()
-
-    conn.close()  # لا نحتاج commit لأننا لم نعدل شيء، فقط قراءة
+    conn.close()
     return rows
+
 def delete_secret_data(secret_id):
-    current = os.getcwd()
-    path = os.path.join(current, "data")
-    conn = sqlite3.connect(os.path.join(path, "my_app_data.db"))
+    conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute("DELETE FROM secrets WHERE id = ?", (secret_id,))
+    conn.commit()
+    conn.close()
+
+# --- PICTURE PATHS ---
+
+def add_pic(pic_path):
+    conn = sqlite3.connect(get_db_path())
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO pic_path (text) VALUES (?)", (pic_path,))
+    conn.commit()
+    conn.close()
+
+def get_pic_path():
+    conn = sqlite3.connect(get_db_path())
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, text FROM pic_path")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def delete_pic_path(image_id):
+    conn = sqlite3.connect(get_db_path())
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM pic_path WHERE id = ?", (image_id,))
     conn.commit()
     conn.close()

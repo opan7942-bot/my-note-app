@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog
 from PIL import Image
+import app_data
 import os
 
 
@@ -40,7 +41,9 @@ class PhotoView(ctk.CTkFrame):
         )
         self.scroll_photo.pack(side="top", fill="both", expand=True)
 
-    def add_photo_card(self, file_path):
+        self.load_data()
+
+    def add_photo_card(self, file_path,image_id=None):
         """Helper to create a stylized photo item card with name, preview, and actions."""
         card = ctk.CTkFrame(self.scroll_photo, fg_color=("gray90", "gray20"), corner_radius=10)
         card.pack(side="top", fill="x", padx=5, pady=4)
@@ -112,9 +115,13 @@ class PhotoView(ctk.CTkFrame):
             fg_color="transparent",
             hover_color=("gray75", "gray30"),
             text_color=("gray40", "gray60"),
-            command=lambda: card.destroy()
+            command=lambda: self.delete_image(card,image_id)
         )
         delete_btn.pack(side="right", padx=(5, 10), pady=10)
+    def delete_image(self,card,image_id):
+        if image_id is not None:
+            app_data.delete_pic_path(image_id)
+        card.destroy()
 
     def get_photo(self):
         file_path = filedialog.askopenfilename(
@@ -122,6 +129,7 @@ class PhotoView(ctk.CTkFrame):
         )
         if file_path:
             self.add_photo_card(file_path)
+            app_data.add_pic(file_path)
 
     def show_full_image(self, file_path):
         """Displays a popup with an auto-scaled view of the photo."""
@@ -145,3 +153,7 @@ class PhotoView(ctk.CTkFrame):
             image_label.pack(expand=True, fill="both", padx=20, pady=20)
         except Exception as e:
             ctk.CTkLabel(popup, text=f"Failed to load image:\n{e}").pack(expand=True)
+    def load_data(self):
+        notes = app_data.get_pic_path()
+        for row in notes:
+            self.add_photo_card(image_id=row[0],file_path=row[1])

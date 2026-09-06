@@ -18,7 +18,7 @@ class MyMainWindow(ctk.CTk):
         ctk.set_default_color_theme("blue")
 
         self.geometry("850x550")
-        self.title("Workspace Hub")
+        self.title("Notes manager")
         self.minsize(800, 500)
 
         # 1. شريط التنقل العلوي (Top Header Bar)
