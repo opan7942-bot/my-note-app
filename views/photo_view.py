@@ -128,8 +128,10 @@ class PhotoView(ctk.CTkFrame):
             filetypes=[("Image Files", "*.png *.jpg *.jpeg *.bmp *.gif")]
         )
         if file_path:
-            self.add_photo_card(file_path)
+            # 1. إضافة المسار لقاعدة البيانات
             app_data.add_pic(file_path)
+            # 2. إعادة تحميل الواجهة لتوليد البطاقة بالـ ID الجديد فوراً
+            self.load_data()
 
     def show_full_image(self, file_path):
         """Displays a popup with an auto-scaled view of the photo."""
@@ -153,7 +155,12 @@ class PhotoView(ctk.CTkFrame):
             image_label.pack(expand=True, fill="both", padx=20, pady=20)
         except Exception as e:
             ctk.CTkLabel(popup, text=f"Failed to load image:\n{e}").pack(expand=True)
+
     def load_data(self):
-        notes = app_data.get_pic_path()
-        for row in notes:
-            self.add_photo_card(image_id=row[0],file_path=row[1])
+        # مسح البطاقات القديمة قبل إعادة الجلب
+        for child in self.scroll_photo.winfo_children():
+            child.destroy()
+
+        photos = app_data.get_pic_path()
+        for row in photos:
+            self.add_photo_card(file_path=row[1], image_id=row[0])
